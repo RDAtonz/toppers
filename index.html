@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Топперы на заказ — каталог</title>
+<title>Tillo Toppers — каталог топперов</title>
 <meta name="description" content="Каталог топперов. Выберите фигурки, оформите заказ онлайн и следите за его статусом.">
 <meta name="theme-color" content="#FFF6EC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,6 +77,8 @@ header.top { padding: 18px 0 6px; }
 .btn.ghost { background: #F3E6D8; color: var(--ink); }
 .btn.wide { width: 100%; }
 a.btn { display: block; text-align: center; text-decoration: none; }
+.btn.wa { background: #25D366; color: #06361A; }
+.hero .btn.wa { justify-self: start; }
 .btn:not(:disabled):active { transform: scale(.98); }
 
 .sheet-bg { position: fixed; inset: 0; z-index: 20; background: rgba(43,29,23,.45); display: grid; align-items: end; justify-items: center; }
@@ -137,7 +139,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding: 26px
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>Топперы <span>на заказ</span></h1>
+      <h1>Tillo <span>Toppers</span></h1>
       <div class="tabs" role="tablist">
         <button role="tab" id="tabCat" aria-selected="true">Каталог</button>
         <button role="tab" id="tabSt" aria-selected="false">Статус заказа</button>
@@ -154,6 +156,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding: 26px
         <span>Сборка от <b id="fDays"></b></span>
         <span>Оплата при получении или Kaspi</span>
       </div>
+      <a class="btn wa" href="https://wa.me/message/KSFGOIE7XI3PL1" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>
     </section>
     <div class="tools">
       <input class="search" id="q" type="search" placeholder="Найти топпер…" autocomplete="off">
@@ -179,6 +182,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding: 26px
         </form>
       </div>
       <div class="panel" id="stRes" hidden></div>
+      <a class="btn wa wide" href="https://wa.me/message/KSFGOIE7XI3PL1" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>
     </div>
   </main>
 
@@ -227,7 +231,7 @@ const PRICE = 60;          // ₸ за одну фигурку
 const MIN_SUM = 15000;     // минимальный заказ, ₸
 const MIN_DAYS = 3;        // минимум дней на сборку
 const KASPI = 'https://pay.kaspi.kz/pay/hekyt6tb';
-const WHATSAPP = '';       // номер магазина цифрами, например 77011234567 (пусто — кнопки WhatsApp скрыты)
+const WA_LINK = 'https://wa.me/message/KSFGOIE7XI3PL1';   // WhatsApp магазина
 const DEMO = true;         // каталог-пример: на карточках пометка «пример»
 
 /* ===== Каталог. img — ссылка на фото (если пусто, показывается значок) ===== */
@@ -266,7 +270,7 @@ const totalQty = () => Object.values(cart).reduce((s, x) => s + x, 0);
 
 $('fPrice').textContent = money(PRICE); $('fMin').textContent = money(MIN_SUM) + ' (' + MIN_QTY + ' шт)';
 $('fDays').textContent = MIN_DAYS + ' ' + plural(MIN_DAYS, 'дня', 'дней', 'дней');
-$('foot').innerHTML = (DEMO ? 'Каталог пока показан с примерами — настоящие фото появятся скоро. ' : '') + (WHATSAPP ? '<br>Вопросы: <a href="https://wa.me/' + WHATSAPP + '">написать в WhatsApp</a>' : '');
+$('foot').innerHTML = (DEMO ? 'Каталог пока показан с примерами — настоящие фото появятся скоро. ' : '') + '<br>Остались вопросы? <a href="' + WA_LINK + '" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>';
 
 /* ----- Каталог ----- */
 function drawCats() {
@@ -398,7 +402,6 @@ $('form').addEventListener('submit', async e => {
   if (!res.ok) return cErr(ERR[res.error] || 'Не получилось отправить заказ. Попробуйте ещё раз.');
   store.set('me', { name, phone });
   const mine = store.get('orders', []); mine.unshift({ number: res.number, tel: phone.replace(/\D/g, '').slice(-4) }); store.set('orders', mine.slice(0, 5));
-  const text = 'Здравствуйте! Мой заказ ' + res.number + ': ' + res.qty + ' шт на ' + money(res.sum) + ', нужен к ' + ru(date) + '.';
   cart = {}; store.set('cart', cart); lastSig = ''; drawGrid(); drawBar();
   $('coForm').hidden = true; $('coDone').hidden = false;
   $('coDone').innerHTML = `<div style="font-size:44px">🎉</div><h2 style="justify-content:center">Заказ принят</h2>
@@ -408,7 +411,7 @@ $('form').addEventListener('submit', async e => {
     ${pay === 'kaspi' ? `<div class="note" style="background:var(--ok-soft);color:var(--ok)">К оплате <b>${money(res.sum)}</b>. В комментарии к платежу укажите номер заказа <b>${esc(res.number)}</b>.</div>` : ''}
     <div class="stack">
       ${pay === 'kaspi' ? `<a class="btn wide" style="text-decoration:none;display:block" href="${KASPI}" target="_blank" rel="noopener">Оплатить в Kaspi</a>` : ''}
-      ${WHATSAPP ? `<a class="btn ghost wide" style="text-decoration:none;display:block" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">Написать нам в WhatsApp</a>` : ''}
+      <a class="btn wa wide" href="${WA_LINK}" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>
       <button class="btn ghost wide" id="dSt">Смотреть статус заказа</button>
       <button class="btn ghost wide" id="dClose">Вернуться в каталог</button>
     </div>`;
