@@ -224,6 +224,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding: 26px
   </div>
 </div>
 
+<script src="photos.js"></script>
 <script>
 /* ===== Настройки сайта ===== */
 const API = 'https://script.google.com/macros/s/AKfycbzmjShQMZKGDjF_XWcvEA80tWXthpz98OFBBW_1HPpsfcLNzjaLtiMCiIn34nwx4FC5ow/exec';
@@ -232,28 +233,23 @@ const MIN_SUM = 15000;     // минимальный заказ, ₸
 const MIN_DAYS = 3;        // минимум дней на сборку
 const KASPI = 'https://pay.kaspi.kz/pay/hekyt6tb';
 const WA_LINK = 'https://wa.me/message/KSFGOIE7XI3PL1';   // WhatsApp магазина
-const DEMO = true;         // каталог-пример: на карточках пометка «пример»
+const DEMO = false;         // каталог-пример: на карточках пометка «пример»
 
 /* ===== Каталог. img — ссылка на фото (если пусто, показывается значок) ===== */
 const CATALOG = [
-  { id: 't01', name: 'Капибара', cat: 'Животные', e: '🦫', c: '#F6E3C5' },
-  { id: 't02', name: 'Котик', cat: 'Животные', e: '🐱', c: '#FFE1D6' },
-  { id: 't03', name: 'Сова', cat: 'Животные', e: '🦉', c: '#E7E0F5' },
-  { id: 't04', name: 'Зайчик', cat: 'Животные', e: '🐰', c: '#FDE3EC' },
-  { id: 't05', name: 'Мишка', cat: 'Животные', e: '🧸', c: '#F3DFC8' },
-  { id: 't06', name: 'Динозаврик', cat: 'Животные', e: '🦖', c: '#DDF0D6' },
-  { id: 't07', name: 'Сердце', cat: 'Праздники', e: '❤️', c: '#FBDADF' },
-  { id: 't08', name: 'Звезда', cat: 'Праздники', e: '⭐', c: '#FFF0C2' },
-  { id: 't09', name: 'С днём рождения', cat: 'Праздники', e: '🎂', c: '#FCE2EE' },
-  { id: 't10', name: 'Ёлочка', cat: 'Праздники', e: '🎄', c: '#D9EEDD' },
-  { id: 't11', name: 'Снежинка', cat: 'Праздники', e: '❄️', c: '#DCEBFA' },
-  { id: 't12', name: 'Подарок', cat: 'Праздники', e: '🎁', c: '#FFE3CC' },
-  { id: 't13', name: 'Тюльпан', cat: 'Цветы', e: '🌷', c: '#FADDE6' },
-  { id: 't14', name: 'Ромашка', cat: 'Цветы', e: '🌼', c: '#FFF3C9' },
-  { id: 't15', name: 'Роза', cat: 'Цветы', e: '🌹', c: '#F9D9D9' },
-  { id: 't16', name: 'Кофейное зерно', cat: 'Кофе', e: '☕', c: '#EADBCB' },
-  { id: 't17', name: 'Круассан', cat: 'Кофе', e: '🥐', c: '#F8E6C6' },
-  { id: 't18', name: 'Пончик', cat: 'Кофе', e: '🍩', c: '#FBDDEB' }
+  { id: 'f01', name: 'Мочи', cat: 'Другое', e: '🍡', c: '#F1F1F1', img: (window.IMG || {}).f01 },
+  { id: 'f02', name: 'Коровка', cat: 'Животные', e: '🐮', c: '#FDE8EF', img: (window.IMG || {}).f02 },
+  { id: 'f03', name: 'Капибара', cat: 'Животные', e: '🦫', c: '#F6E3C5', img: (window.IMG || {}).f03 },
+  { id: 'f04', name: 'Динозаврик', cat: 'Животные', e: '🦖', c: '#DDF0D6', img: (window.IMG || {}).f04 },
+  { id: 'f05', name: 'Черепашка', cat: 'Животные', e: '🐢', c: '#DDF0D6', img: (window.IMG || {}).f05 },
+  { id: 'f06', name: 'Серый котик', cat: 'Животные', e: '🐱', c: '#ECECEC', img: (window.IMG || {}).f06 },
+  { id: 'f07', name: 'Панда', cat: 'Животные', e: '🐼', c: '#EEEEEE', img: (window.IMG || {}).f07 },
+  { id: 'f08', name: 'Львёнок', cat: 'Животные', e: '🦁', c: '#FFE3C8', img: (window.IMG || {}).f08 },
+  { id: 'f09', name: 'Обезьянка', cat: 'Животные', e: '🐵', c: '#FADFD6', img: (window.IMG || {}).f09 },
+  { id: 'f10', name: 'Мопс', cat: 'Животные', e: '🐶', c: '#F6E3C5', img: (window.IMG || {}).f10 },
+  { id: 'f11', name: 'Серый котёнок', cat: 'Животные', e: '🐱', c: '#E8E8EE', img: (window.IMG || {}).f11 },
+  { id: 'f12', name: 'Уточка', cat: 'Животные', e: '🦆', c: '#FFF3B8', img: (window.IMG || {}).f12 },
+  { id: 'f13', name: 'Сердце', cat: 'Праздники', e: '❤️', c: '#FBDADF', img: (window.IMG || {}).f13 }
 ];
 
 const $ = id => document.getElementById(id);
