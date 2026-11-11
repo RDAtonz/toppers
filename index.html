@@ -224,7 +224,6 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding: 26px
   </div>
 </div>
 
-<script src="photos.js"></script>
 <script>
 /* ===== Настройки сайта ===== */
 const API = 'https://script.google.com/macros/s/AKfycbzmjShQMZKGDjF_XWcvEA80tWXthpz98OFBBW_1HPpsfcLNzjaLtiMCiIn34nwx4FC5ow/exec';
@@ -237,19 +236,20 @@ const DEMO = false;         // каталог-пример: на карточк�
 
 /* ===== Каталог. img — ссылка на фото (если пусто, показывается значок) ===== */
 const CATALOG = [
-  { id: 'f01', name: 'Мочи', cat: 'Другое', e: '🍡', c: '#F1F1F1', img: (window.IMG || {}).f01 },
-  { id: 'f02', name: 'Коровка', cat: 'Животные', e: '🐮', c: '#FDE8EF', img: (window.IMG || {}).f02 },
-  { id: 'f03', name: 'Капибара', cat: 'Животные', e: '🦫', c: '#F6E3C5', img: (window.IMG || {}).f03 },
-  { id: 'f04', name: 'Динозаврик', cat: 'Животные', e: '🦖', c: '#DDF0D6', img: (window.IMG || {}).f04 },
-  { id: 'f05', name: 'Черепашка', cat: 'Животные', e: '🐢', c: '#DDF0D6', img: (window.IMG || {}).f05 },
-  { id: 'f06', name: 'Серый котик', cat: 'Животные', e: '🐱', c: '#ECECEC', img: (window.IMG || {}).f06 },
-  { id: 'f07', name: 'Панда', cat: 'Животные', e: '🐼', c: '#EEEEEE', img: (window.IMG || {}).f07 },
-  { id: 'f08', name: 'Львёнок', cat: 'Животные', e: '🦁', c: '#FFE3C8', img: (window.IMG || {}).f08 },
-  { id: 'f09', name: 'Обезьянка', cat: 'Животные', e: '🐵', c: '#FADFD6', img: (window.IMG || {}).f09 },
-  { id: 'f10', name: 'Мопс', cat: 'Животные', e: '🐶', c: '#F6E3C5', img: (window.IMG || {}).f10 },
-  { id: 'f11', name: 'Серый котёнок', cat: 'Животные', e: '🐱', c: '#E8E8EE', img: (window.IMG || {}).f11 },
-  { id: 'f12', name: 'Уточка', cat: 'Животные', e: '🦆', c: '#FFF3B8', img: (window.IMG || {}).f12 },
-  { id: 'f13', name: 'Сердце', cat: 'Праздники', e: '❤️', c: '#FBDADF', img: (window.IMG || {}).f13 }
+  { id: 'f01', name: 'Мочи', cat: 'Другое', e: '🍡', c: '#F1F1F1' },
+  { id: 'f02', name: 'Коровка', cat: 'Животные', e: '🐮', c: '#FDE8EF' },
+  { id: 'f03', name: 'Капибара', cat: 'Животные', e: '🦫', c: '#F6E3C5' },
+  { id: 'f04', name: 'Динозаврик', cat: 'Животные', e: '🦖', c: '#DDF0D6' },
+  { id: 'f05', name: 'Черепашка', cat: 'Животные', e: '🐢', c: '#DDF0D6' },
+  { id: 'f06', name: 'Серый котик', cat: 'Животные', e: '🐱', c: '#ECECEC' },
+  { id: 'f07', name: 'Панда', cat: 'Животные', e: '🐼', c: '#EEEEEE' },
+  { id: 'f08', name: 'Львёнок', cat: 'Животные', e: '🦁', c: '#FFE3C8' },
+  { id: 'f09', name: 'Обезьянка', cat: 'Животные', e: '🐵', c: '#FADFD6' },
+  { id: 'f10', name: 'Мопс', cat: 'Животные', e: '🐶', c: '#F6E3C5' },
+  { id: 'f11', name: 'Серый котёнок', cat: 'Животные', e: '🐱', c: '#E8E8EE' },
+  { id: 'f12', name: 'Утка с бантиком', cat: 'Животные', e: '🦆', c: '#FDE3EC' },
+  { id: 'f13', name: 'Уточка', cat: 'Животные', e: '🦆', c: '#FFF3B8' },
+  { id: 'f14', name: 'Сердце', cat: 'Праздники', e: '❤️', c: '#FBDADF' }
 ];
 
 const $ = id => document.getElementById(id);
@@ -451,6 +451,9 @@ $('stForm').addEventListener('submit', async e => {
 });
 
 drawCats(); drawGrid(); drawBar();
+</script>
+<script>
+fetch('photos.txt').then(function (r) { return r.json(); }).then(function (m) { CATALOG.forEach(function (x) { if (m[x.id]) x.img = m[x.id]; }); drawGrid(); }).catch(function () {});
 </script>
 </body>
 </html>
