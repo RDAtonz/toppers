@@ -134,6 +134,23 @@ a.btn { display: block; text-align: center; text-decoration: none; }
 footer { color: var(--muted); font-size: 13px; text-align: center; padding: 26px 0 0; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1158799490422909');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1158799490422909&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 <div class="wrap">
@@ -233,6 +250,7 @@ const MIN_SUM = 15000;     // минимальный заказ, ₸
 const MIN_DAYS = 3;        // минимум дней на сборку
 const KASPI = 'https://pay.kaspi.kz/pay/hekyt6tb';
 const WA_LINK = 'https://wa.me/message/KSFGOIE7XI3PL1';   // WhatsApp магазина
+document.addEventListener('click', function (ev) { var a = ev.target.closest && ev.target.closest('a[href*="wa.me"]'); if (a) { try { fbq('track', 'Contact'); } catch (e) {} } });
 const DEMO = false;         // каталог-пример: на карточках пометка «пример»
 
 /* ===== Каталог. img — ссылка на фото (если пусто, показывается значок) ===== */
@@ -404,6 +422,7 @@ $('form').addEventListener('submit', async e => {
   const res = await call(Object.assign({ action: 'order', token: lastToken }, data), 4);
   sending = false; $('cSend').disabled = false; $('cSend').textContent = 'Отправить заказ';
   if (!res.ok) return cErr(ERR[res.error] || 'Не получилось отправить заказ. Попробуйте ещё раз.');
+  try { fbq('track', 'Lead', { value: res.sum, currency: 'KZT' }); } catch (e) {}
   store.set('me', { name, phone });
   const mine = store.get('orders', []); mine.unshift({ number: res.number, tel: phone.replace(/\D/g, '').slice(-4) }); store.set('orders', mine.slice(0, 5));
   cart = {}; store.set('cart', cart); lastSig = ''; drawGrid(); drawBar();
