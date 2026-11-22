@@ -172,7 +172,7 @@ src="https://www.facebook.com/tr?id=1158799490422909&ev=PageView&noscript=1"
         <span>Заказ от <b id="fMin"></b></span>
         <span>Сборка от <b id="fDays"></b></span>
         <span>Оплата при получении или Kaspi</span>
-        <span>Бесплатная доставка от <b>70 000 ₸</b></span>
+        <span>Бесплатная доставка от <b>50 000 ₸</b></span>
       </div>
       <a class="btn wa" href="https://wa.me/message/KSFGOIE7XI3PL1" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>
     </section>
@@ -229,9 +229,14 @@ src="https://www.facebook.com/tr?id=1158799490422909&ev=PageView&noscript=1"
         <div class="f"><label for="cDate">К какой дате нужен заказ</label><input id="cDate" type="date"><small id="cDateHint"></small></div>
         <div class="f"><span class="lb">Как получите</span>
           <div class="seg"><label><input type="radio" name="get" value="pickup" checked> Самовывоз</label><label><input type="radio" name="get" value="delivery"> Доставка</label></div></div>
-        <div class="f" id="fAddr" hidden><label for="cAddr">Адрес доставки</label><input id="cAddr" maxlength="160" autocomplete="street-address" placeholder="Город, улица, дом"><small>Бесплатно при заказе от 70 000 ₸. Если меньше, стоимость доставки уточним в WhatsApp.</small></div>
+        <div id="fAddr" hidden>
+          <div class="note" id="dNote"></div>
+          <div class="f"><label for="cAddr">Адрес доставки</label><input id="cAddr" maxlength="120" autocomplete="street-address" placeholder="Город, улица, дом"></div>
+          <div class="f"><label for="cRcv">Номер того, кто примет заказ</label><input id="cRcv" type="tel" inputmode="tel" maxlength="20" placeholder="+7 701 123 45 67"><small>Если принимаете сами — впишите свой номер.</small></div>
+        </div>
         <div class="f"><span class="lb">Оплата</span>
-          <div class="seg"><label><input type="radio" name="pay" value="cash" checked> При получении</label><label><input type="radio" name="pay" value="kaspi"> Kaspi</label></div></div>
+          <div class="seg"><label><input type="radio" name="pay" value="cash" checked> При получении</label><label><input type="radio" name="pay" value="kaspi"> Kaspi</label></div>
+          <small id="payHint" hidden>После оплаты через Kaspi <b>обязательно пришлите чек</b> нам в <a href="https://wa.me/message/KSFGOIE7XI3PL1" target="_blank" rel="noopener">WhatsApp</a>.</small></div>
         <div class="f"><label for="cCom">Комментарий <small>(необязательно)</small></label><textarea id="cCom" rows="2" maxlength="300" placeholder="Пожелания к заказу"></textarea></div>
         <input class="hp" id="cSite" name="site" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="err" id="cErr" hidden></div>
@@ -247,6 +252,7 @@ src="https://www.facebook.com/tr?id=1158799490422909&ev=PageView&noscript=1"
 const API = 'https://script.google.com/macros/s/AKfycbzmjShQMZKGDjF_XWcvEA80tWXthpz98OFBBW_1HPpsfcLNzjaLtiMCiIn34nwx4FC5ow/exec';
 const PRICE = 60;          // ₸ за одну фигурку
 const MIN_SUM = 15000;     // минимальный заказ, ₸
+const FREE_DELIVERY = 50000; // от этой суммы доставка за наш счёт, ₸
 const MIN_DAYS = 3;        // минимум дней на сборку
 const KASPI = 'https://pay.kaspi.kz/pay/hekyt6tb';
 const WA_LINK = 'https://wa.me/message/KSFGOIE7XI3PL1';   // WhatsApp магазина
@@ -368,13 +374,23 @@ $('bGo').onclick = () => {
   $('cDate').min = minDate(); if (!$('cDate').value || $('cDate').value < minDate()) $('cDate').value = minDate();
   $('cDateHint').textContent = 'Самая ранняя дата — ' + ru(minDate()) + ': на сборку нужно минимум ' + MIN_DAYS + ' ' + plural(MIN_DAYS, 'день', 'дня', 'дней') + '. Если соберём раньше — вы увидите это в статусе заказа.';
   $('coForm').hidden = false; $('coDone').hidden = true; $('cErr').hidden = true;
-  drawLines(); $('coBg').hidden = false; document.body.style.overflow = 'hidden';
+  drawLines(); drawDelivery(); drawPay(); $('coBg').hidden = false; document.body.style.overflow = 'hidden';
 };
 function closeCo() { $('coBg').hidden = true; document.body.style.overflow = ''; }
 $('coX').onclick = closeCo;
 $('coBg').addEventListener('click', e => { if (e.target === $('coBg') && !sending) closeCo(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('coBg').hidden && !sending) closeCo(); });
-document.querySelectorAll('input[name=get]').forEach(r => r.onchange = () => { $('fAddr').hidden = document.querySelector('input[name=get]:checked').value !== 'delivery'; });
+const cartSum = () => cartItems().reduce((t, x) => t + x.q, 0) * PRICE;
+function drawDelivery() {
+  $('fAddr').hidden = document.querySelector('input[name=get]:checked').value !== 'delivery';
+  const s = cartSum();
+  $('dNote').innerHTML = s >= FREE_DELIVERY
+    ? 'Доставка <b>за наш счёт</b> — заказ от ' + money(FREE_DELIVERY) + '.'
+    : '<b>Доставка за ваш счёт.</b> Бесплатно доставляем заказы от ' + money(FREE_DELIVERY) + ' (до бесплатной доставки не хватает ' + money(FREE_DELIVERY - s) + '). Стоимость доставки сообщим в WhatsApp.';
+}
+function drawPay() { $('payHint').hidden = document.querySelector('input[name=pay]:checked').value !== 'kaspi'; }
+document.querySelectorAll('input[name=get]').forEach(r => r.onchange = drawDelivery);
+document.querySelectorAll('input[name=pay]').forEach(r => r.onchange = drawPay);
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function call(body, tries) {
@@ -393,7 +409,7 @@ async function call(body, tries) {
 }
 const ERR = {
   name: 'Впишите имя.', phone: 'Проверьте номер WhatsApp — в нём должно быть не меньше 10 цифр.', date: 'Выберите дату не раньше ' + ru(minDate()) + '.',
-  addr: 'Впишите адрес доставки.', items: 'В корзине что-то не так. Обновите страницу и соберите заказ заново.', min: 'Минимальный заказ — ' + money(MIN_SUM) + '.',
+  addr: 'Впишите адрес доставки.', rcv: 'Впишите номер того, кто примет заказ — не меньше 10 цифр.', items: 'В корзине что-то не так. Обновите страницу и соберите заказ заново.', min: 'Минимальный заказ — ' + money(MIN_SUM) + '.',
   limit: 'Сейчас очень много заказов. Попробуйте через несколько минут.', busy: 'Сервер занят. Нажмите «Отправить заказ» ещё раз — второй заказ не создастся.',
   network: 'Нет связи. Проверьте интернет и нажмите «Отправить заказ» ещё раз — второй заказ не создастся.'
 };
@@ -403,11 +419,14 @@ $('form').addEventListener('submit', async e => {
   e.preventDefault(); if (sending) return;
   const name = $('cName').value.trim(), phone = $('cTel').value.trim(), date = $('cDate').value;
   const get = document.querySelector('input[name=get]:checked').value, pay = document.querySelector('input[name=pay]:checked').value;
-  const addr = $('cAddr').value.trim(), comment = $('cCom').value.trim();
+  const rcv = $('cRcv').value.trim(), comment = $('cCom').value.trim();
+  let addr = $('cAddr').value.trim();
   if (name.length < 2) { $('cName').focus(); return cErr(ERR.name); }
   if (phone.replace(/\D/g, '').length < 10) { $('cTel').focus(); return cErr(ERR.phone); }
   if (!date || date < minDate()) { $('cDate').focus(); return cErr(ERR.date); }
   if (get === 'delivery' && addr.length < 5) { $('cAddr').focus(); return cErr(ERR.addr); }
+  if (get === 'delivery' && rcv.replace(/\D/g, '').length < 10) { $('cRcv').focus(); return cErr(ERR.rcv); }
+  if (get === 'delivery') { const tail = ' · принимает: ' + rcv; addr = addr.slice(0, 160 - tail.length) + tail; }
   const items = cartItems().map(x => ({ n: x.n, q: x.q }));
   const data = { name, phone, date, get, addr, pay, comment, items, site: $('cSite').value };
   const sig = JSON.stringify(data);
@@ -425,10 +444,11 @@ $('form').addEventListener('submit', async e => {
     <p>Номер вашего заказа</p><div class="num big">${esc(res.number)}</div>
     <p>${res.qty} шт · <b>${money(res.sum)}</b> · к ${ru(date)}</p>
     <div class="note">Сохраните номер: по нему и последним 4 цифрам телефона можно смотреть статус заказа. Мы напишем вам в WhatsApp для подтверждения.</div>
-    ${pay === 'kaspi' ? `<div class="note" style="background:var(--ok-soft);color:var(--ok)">К оплате <b>${money(res.sum)}</b>. В комментарии к платежу укажите номер заказа <b>${esc(res.number)}</b>.</div>` : ''}
+    ${pay === 'kaspi' ? `<div class="note" style="background:var(--ok-soft);color:var(--ok)">К оплате <b>${money(res.sum)}</b>. В комментарии к платежу укажите номер заказа <b>${esc(res.number)}</b>.<br><b>После оплаты обязательно пришлите чек нам в WhatsApp</b> — кнопка ниже.</div>` : ''}
+    ${get === 'delivery' && res.sum < FREE_DELIVERY ? `<div class="note">Доставка за ваш счёт: стоимость сообщим в WhatsApp.</div>` : ''}
     <div class="stack">
       ${pay === 'kaspi' ? `<a class="btn wide" style="text-decoration:none;display:block" href="${KASPI}" target="_blank" rel="noopener">Оплатить в Kaspi</a>` : ''}
-      <a class="btn wa wide" href="${WA_LINK}" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>
+      <a class="btn wa wide" href="${WA_LINK}" target="_blank" rel="noopener">${pay === 'kaspi' ? 'Отправить чек в WhatsApp' : 'Напишите нам на WhatsApp'}</a>
       <button class="btn ghost wide" id="dSt">Смотреть статус заказа</button>
       <button class="btn ghost wide" id="dClose">Вернуться в каталог</button>
     </div>`;
